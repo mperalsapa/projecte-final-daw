@@ -1,3 +1,4 @@
 [submodule "ovo"]
 	path = ovo
 	url = git@github.com:mperalsapa/ovo.git
+	branch = main
