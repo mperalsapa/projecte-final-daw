@@ -2,3 +2,7 @@
 	path = ovo
 	url = git@github.com:mperalsapa/ovo.git
 	branch = main
+[submodule "ovo-web"]
+	path = ovo-web
+	url = git@github.com:mperalsapa/ovo-web.git
+	branch = main
