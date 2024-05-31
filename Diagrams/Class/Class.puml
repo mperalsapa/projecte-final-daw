@@ -1,0 +1,559 @@
+@startuml
+namespace apiController {
+    class GetSyncGroupsResponse << (S,Aquamarine) >> {
+        + Groups <font color=blue>map</font>[string]*syncplay.SyncGroup
+        + CurrentGroup string
+
+    }
+    class SyncGroupJoin << (S,Aquamarine) >> {
+        + GroupID string
+
+    }
+    class ToggleItemUserState << (S,Aquamarine) >> {
+        + ItemID uint
+
+    }
+}
+
+
+namespace component {
+    class AdminLibraryFormData << (S,Aquamarine) >> {
+        + Name string
+        + Paths []string
+        + Description string
+        + Error string
+
+    }
+    class EpisodeCardData << (S,Aquamarine) >> {
+        + Episode model.Item
+        + CardPath string
+
+    }
+    class HorizontalCardData << (S,Aquamarine) >> {
+        + CardTitle string
+        + ImagePath string
+        + CardPath string
+        + Classes string
+
+    }
+    class LibraryHorizontalCardData << (S,Aquamarine) >> {
+        + CardTitle string
+        + ImagePath string
+        + CardPath string
+        + Classes string
+
+    }
+    class UserSidebarData << (S,Aquamarine) >> {
+        + UserSession session.UserSession
+        + IsAdminSection bool
+
+    }
+    class VerticalCardTitleData << (S,Aquamarine) >> {
+        + CardTitle string
+        + ImagePath string
+        + CardPath string
+
+    }
+    class VerticalCardTitleSubtitleData << (S,Aquamarine) >> {
+        + CardTitle string
+        + CardSubtitle string
+        + ImagePath string
+        + CardPath string
+        + Classes string
+
+    }
+}
+
+
+namespace config {
+    class variables << (S,Aquamarine) >> {
+        + DatabaseType string
+        + DatabaseHost string
+        + DatabaseUsername string
+        + DatabasePassword string
+        + DatabaseName string
+        + TMDBApiKey string
+
+    }
+}
+
+
+namespace controller {
+    class LibraryForm << (S,Aquamarine) >> {
+        + Submit string
+        + ID uint
+        + Type string
+        + Name string
+        + Paths []string
+
+    }
+    class PlayerData << (S,Aquamarine) >> {
+        + ItemID uint
+
+    }
+}
+
+
+namespace database {
+    class dbInst << (S,Aquamarine) >> {
+        - connection *gorm.DB
+        - config *gorm.Config
+
+    }
+}
+
+
+namespace file {
+    class FileInfo << (S,Aquamarine) >> {
+        + Name string
+        + Path string
+        + Size int64
+
+    }
+    class FileMetaInfo << (S,Aquamarine) >> {
+        + Name string
+        + Year int
+        + MetaProvider string
+        + MetaID string
+        + FilePath string
+
+    }
+    class Format << (S,Aquamarine) >> {
+        + Filename string
+        + NbStreams int
+        + NbPrograms int
+        + FormatName string
+        + FormatLongName string
+        + StartTime float64
+        + Duration float64
+        + Size uint
+        + BitRate uint
+
+    }
+    class Metadata << (S,Aquamarine) >> {
+        + Format Format
+
+        + Duration() time.Duration
+        + FancyDuration() string
+
+    }
+}
+
+
+namespace main {
+    class Format << (S,Aquamarine) >> {
+        + Filename string
+        + NbStreams int
+        + NbPrograms int
+        + FormatName string
+        + FormatLongName string
+        + StartTime float64
+        + Duration float64
+        + Size uint
+        + BitRate uint
+
+    }
+    class ProbeData << (S,Aquamarine) >> {
+        + Format Format
+
+        + Duration() time.Duration
+
+    }
+}
+
+
+namespace model {
+    class Credit << (S,Aquamarine) >> {
+        + ItemID uint
+        + Item Item
+        + PersonID uint
+        + Person Person
+        + Department string
+        + Role string
+
+        + Save() error
+
+    }
+    class Device << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+        + DeletedAt gorm.DeletedAt
+        + UserID uint
+        + User User
+        + Name string
+
+        + BeforeCreate(tx *gorm.DB) error
+        + Save() error
+        + UpdateDeviceActivity() error
+
+    }
+    class Item << (S,Aquamarine) >> {
+        + LibraryID uint
+        + ItemType string
+        + MetaProvider string
+        + MetaID string
+        + MetaRating float32
+        + Title string
+        + OriginalTitle string
+        + Description string
+        + TagLine string
+        + ReleaseDate time.Time
+        + EndDate *time.Time
+        + PosterPath string
+        + FilePath string
+        + Duration time.Duration
+        + LastMetadataScan *time.Time
+        + ParentItem uint
+        + Credits []Credit
+
+        + Save() error
+        + Delete() 
+        + FetchMetadata() 
+        + UpdateMovieMetadata(metadata tmdb.TMDBMetadataItem) 
+        + UpdateRuntime() 
+        + UpdateItemRuntime() 
+        + FetchCredits() 
+        + GetDirectors() []Credit
+        + GetWriters() []Credit
+        + GetCast() []Credit
+        + GetChildren(itemType string) []Item
+        + GetSeasons() []Item
+        + GetEpisodes() []Item
+        + GetFancyDuration() string
+
+    }
+    class Library << (S,Aquamarine) >> {
+        + Type string
+        + Name string
+        + ImagePath string
+        + Paths []string
+        + Items []Item
+
+        - removeEmptyPaths() 
+
+        + Validate() error
+        + DeDuplicateItems() 
+        + DeleteLibrary() 
+        + Save() error
+        + GetItems(order string) []Item
+        + LoadItems(orderBy string) 
+        + ScanLibrary() error
+        + ItemExistsOnDisk(item Item) bool
+        + GetItemByPath(path string) Item
+        + RemoveOrphanItems() 
+        + ScanForNewItems() 
+        + GetPathsMap() <font color=blue>map</font>[string]bool
+        + ScanForNewMovies() 
+        + ScanForNewShows() 
+        + ScanForNewSeasons(show Item, itemsPaths <font color=blue>map</font>[string]bool) 
+        + ScanForNewEpisodes(season Item, itemsPaths <font color=blue>map</font>[string]bool) 
+        + GetLibraryMainItems() []Item
+        + GetLastItems(limit int) []Item
+
+    }
+    class Person << (S,Aquamarine) >> {
+        + MetaID string
+        + MetaPlatform string
+        + Name string
+        + Biography string
+        + Birthday time.Time
+        + Deathday time.Time
+        + PlaceOfBirth string
+        + ProfilePath string
+        + Credits []Credit
+
+        + Save() error
+        + GetCredits() []Credit
+        + LoadCredits() 
+        + GetCreditItems() []Item
+
+    }
+    class User << (S,Aquamarine) >> {
+        + Username string
+        + Password string
+        + Role Role
+        + WatchedItems []Item
+        + FavoriteItems []Item
+        + Enabled bool
+
+        + HashPassword() 
+        + CheckPassword(password string) bool
+        + Save() 
+        + Delete() 
+        + ToggleFavoriteItem(itemID uint) bool
+        + FetchFavoriteItems() 
+        + ItemIsFavorite(itemID uint) bool
+        + ToggleWatchedItem(itemID uint) bool
+        + FetchWatchedItems() 
+        + ItemIsWatched(itemID uint) bool
+
+    }
+    class model.LibraryType << (T, #FF7700) >>  {
+    }
+    class model.Role << (T, #FF7700) >>  {
+    }
+}
+"gorm.Model" *-- "model.Credit"
+"gorm.Model" *-- "model.Item"
+"gorm.Model" *-- "model.Library"
+"gorm.Model" *-- "model.Person"
+"gorm.Model" *-- "model.User"
+
+
+namespace page {
+    class AdminDashboardPageData << (S,Aquamarine) >> {
+        + UserSession session.UserSession
+
+    }
+    class AdminLibraryFormPageData << (S,Aquamarine) >> {
+        + Editing bool
+        + Library model.Library
+        + ErrorMsg string
+        + UserSession session.UserSession
+
+    }
+    class HomePageData << (S,Aquamarine) >> {
+        + UserSession session.UserSession
+
+    }
+    class ItemDetailsPageData << (S,Aquamarine) >> {
+        + Item model.Item
+        + UserSession session.UserSession
+        + User model.User
+
+    }
+    class LibrariesPageData << (S,Aquamarine) >> {
+        + Libraries []model.Library
+        + FormContent component.AdminLibraryFormData
+        + UserSession session.UserSession
+
+    }
+    class LibraryPageData << (S,Aquamarine) >> {
+        + UserSession session.UserSession
+        + Library model.Library
+
+    }
+    class LoginPageData << (S,Aquamarine) >> {
+        + AlertMsg string
+        + Username string
+
+    }
+    class MissingItemModalData << (S,Aquamarine) >> {
+        + Title string
+        + Message string
+        + ConfirmButtonText string
+        + RedirectRoute string
+
+    }
+    class PersonDetailsPageData << (S,Aquamarine) >> {
+        + Person model.Person
+        + UserSession session.UserSession
+
+    }
+    class PlayerData << (S,Aquamarine) >> {
+        + UserSession session.UserSession
+        + Item model.Item
+
+    }
+    class RegisterPageData << (S,Aquamarine) >> {
+        + AlertMsg string
+        + Username string
+
+    }
+}
+
+
+namespace router {
+    class adminRoute << (S,Aquamarine) >> {
+        + Dashboard string
+        + Libraries string
+        + Library string
+        + Users string
+        + User string
+        + Settings string
+        + Command string
+
+    }
+    class apiRoutes << (S,Aquamarine) >> {
+        + Library string
+        + Libraries string
+        + SyncplayGroups string
+        + ToggleFavoriteItem string
+        + ToggleWatchedItem string
+
+    }
+    class route << (S,Aquamarine) >> {
+        + Assets string
+        + Api string
+        + Login string
+        + Logout string
+        + Register string
+        + Profile string
+        + Home string
+        + Library string
+        + Item string
+        + Person string
+        + Player string
+        + DownloadItem string
+        + Websocket string
+
+    }
+}
+
+
+namespace session {
+    class UserSession << (S,Aquamarine) >> {
+        + Username string
+        + Authenticated bool
+        + SyncPlayGroup string
+        + Role model.Role
+        + ErrorMsg string
+        + DeviceID uuid.UUID
+
+        + SaveUserSession(c echo.Context) 
+        + PopErrorMessage(c echo.Context) string
+        + IsAdmin() bool
+
+    }
+    class sessionSettings << (S,Aquamarine) >> {
+        + Store *sessions.CookieStore
+        + Name string
+        + MaxAge int
+
+    }
+}
+
+
+namespace shared {
+    class AdminPageData << (S,Aquamarine) >> {
+        + Title string
+        + UserSession session.UserSession
+        + Classes string
+        + HideNoise bool
+
+    }
+    class PageData << (S,Aquamarine) >> {
+        + Title string
+        + HideNoise bool
+
+    }
+    class UserPageData << (S,Aquamarine) >> {
+        + Title string
+        + UserSession session.UserSession
+        + Classes string
+        + HideNoise bool
+
+    }
+}
+
+
+namespace syncplay {
+    class Sync << (S,Aquamarine) >> {
+        + CurrentItem *model.Item
+        + StartedFrom float32
+        + StartedAt int64
+        + IsPlaying bool
+        + IsPlayingBeforeBuffer bool
+
+        + SetNewItem(item *model.Item) 
+        + GetStartedAt() int64
+
+    }
+    class SyncGroup << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + Name string
+        + Connections <font color=blue>map</font>[*websocket.Conn]bool
+        + Users []string
+        + Sync Sync
+
+        + AddUser(username string) 
+        + RemoveUser(user string) 
+        + AddConnection(conn *websocket.Conn) 
+        + RemoveConnection(conn *websocket.Conn) 
+        + GetConnectionList() []*websocket.Conn
+        + SetWaitingClient(conn *websocket.Conn) 
+        + SetReadyClient(conn *websocket.Conn) 
+        + GetWaitingCount() int
+        + CanPlay() bool
+        + SetState(playing bool, runtime float32) 
+        + SetPlayingBeforeBuffer(playingBeforeBuffer bool) 
+
+    }
+    class SyncGroups << (S,Aquamarine) >> {
+        + Groups <font color=blue>map</font>[string]*SyncGroup
+
+        + CreateGroup(user model.User) *SyncGroup
+        + GetGroup(id string) *SyncGroup
+        + GetGroups() <font color=blue>map</font>[string]*SyncGroup
+        + DeleteGroup(id string) 
+
+    }
+}
+"sync.RWMutex" *-- "syncplay.Sync"
+"sync.RWMutex" *-- "syncplay.SyncGroup"
+"sync.RWMutex" *-- "syncplay.SyncGroups"
+
+
+namespace tmdb {
+    class TMDBCredit << (S,Aquamarine) >> {
+        + ItemTmdbID string
+        + ItemType string
+        + PersonTmdbID string
+        + Department string
+        + Role string
+
+    }
+    class TMDBMetadataItem << (S,Aquamarine) >> {
+        + TmdbID string
+        + Title string
+        + OriginalTitle string
+        + Description string
+        + Tagline string
+        + Rating float32
+        + ReleaseDate time.Time
+        + EndDate time.Time
+        + PosterPath string
+        + BackdropPath string
+        + SeasonNumber int
+        + EpisodeNumber int
+        + EpisodeTitle string
+        + EpisodeAirDate string
+
+    }
+    class TMDBPerson << (S,Aquamarine) >> {
+        + TmdbID string
+        + Name string
+        + Biography string
+        + Birthday time.Time
+        + Deathday time.Time
+        + PlaceOfBirth string
+        + ProfilePath string
+
+    }
+}
+
+
+namespace websocket {
+    class Message << (S,Aquamarine) >> {
+        + Event string
+        + StartedFrom float32
+        + StartedAt int64
+        + Item *model.Item
+
+    }
+    class WsServer << (S,Aquamarine) >> {
+        - clients <font color=blue>map</font>[*websocket.Conn]bool
+        - upgrader *websocket.Upgrader
+
+        + Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error)
+        + ReadLoop(ws *websocket.Conn, group *syncplay.SyncGroup) 
+
+    }
+}
+"sync.Mutex" *-- "websocket.WsServer"
+
+
+"__builtin__.int" #.. "model.Role"
+"__builtin__.string" #.. "model.LibraryType"
+@enduml
