@@ -35,4 +35,30 @@ This project aims to that people that still own their content, and have a physic
 -	Binary file (GO program compiled containing the backend and the frontend)
 -	Database (Supported by GORM, could be SQLite, MySQL, PostgreSQL)
 -	FFMpeg installed in PATH
-
+# Diagrams
+## Use Case
+### Admin
+![](Diagrams/Use%20Case/Admin.drawio.png)
+### User
+![](Diagrams/Use%20Case/User.drawio.png)
+### Visitor
+![](Diagrams/Use%20Case/Visitor.drawio.png)
+## Activity
+### Admin
+![](Diagrams/Activity/Admin.drawio.png)
+### User
+![](Diagrams/Activity/User.home.drawio.png)
+![](Diagrams/Activity/User.item.drawio.png)
+![](Diagrams/Activity/User.Person.drawio.png)
+![](Diagrams/Activity/User.playback.png)
+![](Diagrams/Activity/User.Syncplay.drawio.png)
+### Visitor
+![](Diagrams/Activity/Visitor.drawio.png)
+## Database
+### V1
+![](Diagrams/Database/Database.png)
+### V3
+![](Diagrams/Database/Database_v3.png)
+## Class
+[![](Diagrams/Class/Class.svg)](Diagrams/Class/Class.svg)
+> **_NOTE_** It is recomended to open this diagram itself to have a better visualization.
